@@ -4,6 +4,10 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
+ext {
+    springCloudVersion = "2023.0.3"
+}
+
 group = 'com.bangbangbwa'
 version = '0.0.1-SNAPSHOT'
 
@@ -46,6 +50,12 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
     // Test
     testRuntimeOnly 'com.h2database:h2'
     testCompileOnly 'org.projectlombok:lombok'
@@ -55,6 +65,13 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
+}
+
 
 tasks.named('test') {
     useJUnitPlatform()
