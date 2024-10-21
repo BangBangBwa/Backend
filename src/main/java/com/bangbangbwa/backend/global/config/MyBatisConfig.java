@@ -1,5 +1,6 @@
 package com.bangbangbwa.backend.global.config;
 
+import com.bangbangbwa.backend.global.config.log.SqlLogInterceptor;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -19,6 +20,7 @@ public class MyBatisConfig {
   public SqlSessionFactory sqlSessionFactory() throws Exception {
     SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
     sqlSessionFactoryBean.setDataSource(dataSource);
+    sqlSessionFactoryBean.setPlugins(new SqlLogInterceptor());
 
     Resource configLocation = new PathMatchingResourcePatternResolver().getResource(
         "classpath:mybatis/sqlmap-config.xml");
@@ -26,7 +28,7 @@ public class MyBatisConfig {
         "classpath:mybatis/map/*.xml");
     sqlSessionFactoryBean.setConfigLocation(configLocation);
     sqlSessionFactoryBean.setMapperLocations(mapperLocations);
-    sqlSessionFactoryBean.setTypeAliasesPackage("com.ggb.graduationgoodbye.domain");
+    sqlSessionFactoryBean.setTypeAliasesPackage("com.bangbangbwa.backend.domain");
 
     return sqlSessionFactoryBean.getObject();
   }
