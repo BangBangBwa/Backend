@@ -1,5 +1,7 @@
 package com.bangbangbwa.backend.global.error;
 
+import com.bangbangbwa.backend.domain.member.exception.NotSignupMemberException;
+import com.bangbangbwa.backend.domain.member.exception.type.MemberErrorType;
 import com.bangbangbwa.backend.global.error.exception.BusinessException;
 import com.bangbangbwa.backend.global.error.exception.ForbiddenException;
 import com.bangbangbwa.backend.global.error.exception.ServerException;
@@ -46,6 +48,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(UnAuthenticatedException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ApiResponse<?> handler(UnAuthenticatedException e) {
+    if (e instanceof NotSignupMemberException) {
+      return ApiResponse.error(e.getCode(), MemberErrorType.NOT_SIGN_UP_MEMBER.getMessage(),
+          e.getMessage());
+    }
     return ApiResponse.error(e.getCode(), e.getMessage());
   }
 

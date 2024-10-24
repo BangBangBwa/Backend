@@ -9,8 +9,18 @@ public class MemberLoginDto {
   public record Request(
 
       @Schema(description = "인가코드")
-      @NotBlank(message = "인가 코드를 입력헤주세요.")
+      @NotBlank(message = "인가코드를 입력헤주세요.")
       String authCode
+  ) {
+
+  }
+
+  @Schema(name = "LoginResponse", description = "로그인 응답 DTO")
+  public record Response(
+      @Schema(description = "액세스 토큰", examples = "xxx.xxx.xxx")
+      String accessToken,
+      @Schema(description = "리프레쉬 토큰", examples = "xxx.xxx.xxx")
+      String refreshToken
   ) {
 
   }

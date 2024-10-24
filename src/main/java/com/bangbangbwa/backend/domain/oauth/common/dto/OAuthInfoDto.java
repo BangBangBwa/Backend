@@ -15,4 +15,5 @@ public class OAuthInfoDto {
   private String snsId;
   private SnsType snsType;
   private String email;
+  private String oAuthToken;
 }

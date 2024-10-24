@@ -35,4 +35,24 @@ public class OAuthInfoProvider {
       throw new ServerException();
     }
   }
+
+  public OAuthInfoDto getInfoByCode(SnsType snsType, String authCode) {
+    try {
+      switch (snsType) {
+        case GOOGLE -> {
+          return oAuthFeignManager.getGoogleInfoByCode(authCode);
+        }
+        case KAKAO -> {
+          return oAuthFeignManager.getKakaoInfoByCode(authCode);
+        }
+        case NAVER -> {
+          return oAuthFeignManager.getNaverInfoByCode(authCode);
+        }
+        default -> throw new InvalidSnsTypeException();
+      }
+    } catch (FeignException e) {
+      log.error("FeignError : ", e);
+      throw new ServerException();
+    }
+  }
 }

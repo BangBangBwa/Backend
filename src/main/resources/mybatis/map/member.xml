@@ -9,4 +9,7 @@
     VALUES (#{snsType}, #{snsId}, #{email}, #{nickname}, #{profile}, #{role},
     #{deletedAt}, #{createdId}, #{createdAt}, #{updatedId}, #{updatedAt})
   </insert>
+  <select id="findBySns" parameterType="HashMap" resultType="member">
+    SELECT * FROM members WHERE sns_id = #{snsId} AND sns_type = #{snsType};
+  </select>
 </mapper>

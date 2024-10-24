@@ -27,4 +27,14 @@ public class MemberSignupDto {
   ) {
 
   }
+
+  @Schema(name = "SignupResponse", description = "회원가입 응답 DTO")
+  public record Response(
+      @Schema(description = "액세스 토큰", examples = "xxx.xxx.xxx")
+      String accessToken,
+      @Schema(description = "리프레쉬 토큰", examples = "xxx.xxx.xxx")
+      String refreshToken
+  ) {
+
+  }
 }
