@@ -46,7 +46,7 @@ public class SnsController implements SnsApi{
 
   @GetMapping("/getPostList")
   public ApiResponse<List<GetPostListDto.Response>> getPostList() {
-    List<Post> postList = snsService.getPostList(PostType.MEMBER);
+    List<Post> postList = snsService.getPostList(PostType.STREAMER);
     List<GetPostListDto.Response> response = PostMapper.INSTANCE.dtoToGetPostListResponse(postList);
     return ApiResponse.ok(response);
   }
@@ -91,6 +91,7 @@ public class SnsController implements SnsApi{
     return ApiResponse.ok(response);
   }
 
+  // note. 현재 비회원도 사용 가능한 오류 발생
   @GetMapping("/searchMember/{nickname}")
   @PreAuthorize("hasAuthority('MEMBER')")
   public ApiResponse<List<SearchMemberDto.Response>> searchMember(@PathVariable String nickname) {

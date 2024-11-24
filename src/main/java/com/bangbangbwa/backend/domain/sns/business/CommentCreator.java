@@ -11,5 +11,6 @@ public class CommentCreator {
 
   private final CommentRepository commentRepository;
 
-  public void save(Comment comment) { commentRepository.save(comment); }
+  public void save(Comment comment) {
+    commentRepository.save(comment); }
 }

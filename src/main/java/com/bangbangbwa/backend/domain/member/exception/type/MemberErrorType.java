@@ -14,7 +14,7 @@ public enum MemberErrorType {
   DUPLICATED_NICKNAME_ERROR("이미 사용중인 닉네임 입니다."),
   EMPTY_NICKNAME("닉네임이 공백 혹은 null 입니다."),
 
-
+  UN_AUTHENTICATION_MEMBER_EXCEPTION("인증되지 않은 사용자입니다."),
   AUTHENTICATION_NULL_ERROR("Authentication 이 NULL 입니다."),
   AUTHENTICATION_NAME_NULL_ERROR("Authentication name 이 NULL 입니다."),
   NOT_PARSED_VALUE_ERROR("파싱되지 않는 값입니다.");

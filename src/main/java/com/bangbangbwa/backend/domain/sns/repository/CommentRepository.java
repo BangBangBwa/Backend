@@ -11,5 +11,6 @@ public class CommentRepository {
 
   private final SqlSession mysql;
 
-  public void save(Comment comment) { mysql.insert("CommentMapper.save", comment); }
+  public void save(Comment comment) {
+    mysql.insert("CommentMapper.save", comment); }
 }

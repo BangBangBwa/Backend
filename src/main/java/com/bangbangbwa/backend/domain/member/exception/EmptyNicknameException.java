@@ -1,5 +1,6 @@
-package com.bangbangbwa.backend.domain.member.exception.type;
+package com.bangbangbwa.backend.domain.member.exception;
 
+import com.bangbangbwa.backend.domain.member.exception.type.MemberErrorType;
 import com.bangbangbwa.backend.global.error.exception.BusinessException;
 import lombok.Getter;
 

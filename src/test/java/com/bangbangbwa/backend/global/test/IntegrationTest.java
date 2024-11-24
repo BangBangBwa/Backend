@@ -1,5 +1,7 @@
 package com.bangbangbwa.backend.global.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +21,11 @@ import org.springframework.web.context.WebApplicationContext;
 abstract public class IntegrationTest {
 
   protected MockMvc mvc;
+
+  protected Gson gson = new Gson();
+
+  @Autowired
+  protected ObjectMapper objectMapper;
 
   @Autowired
   private WebApplicationContext context;

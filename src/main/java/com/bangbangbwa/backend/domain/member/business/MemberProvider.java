@@ -4,6 +4,7 @@ import com.bangbangbwa.backend.domain.member.common.entity.Member;
 import com.bangbangbwa.backend.domain.member.exception.AuthenticationNameNullException;
 import com.bangbangbwa.backend.domain.member.exception.AuthenticationNullException;
 import com.bangbangbwa.backend.domain.member.exception.NotParsedValueException;
+import com.bangbangbwa.backend.domain.member.exception.UnAuthenticationMemberException;
 import com.bangbangbwa.backend.domain.member.exception.type.MemberErrorType;
 import com.bangbangbwa.backend.domain.promotion.business.StreamerReader;
 import com.bangbangbwa.backend.domain.promotion.common.entity.Streamer;
@@ -21,10 +22,16 @@ public class MemberProvider {
   private final MemberReader memberReader;
   private final StreamerReader streamerReader;
 
+  private final String GUEST = "anonymousUser";
+
+
   public Long getCurrentMemberId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (Objects.isNull(authentication)) {
       throw new AuthenticationNullException();
+    }
+    if (authentication.getPrincipal().equals(GUEST)) {
+      throw new UnAuthenticationMemberException();
     }
     String name = authentication.getName();
     if (!StringUtils.hasText(name)) {
@@ -50,7 +57,7 @@ public class MemberProvider {
 
   public Long getCurrentMemberIdOrNull() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication.getPrincipal().equals("anonymousUser")) return null;
+    if (authentication.getPrincipal().equals(GUEST)) return null;
     return getCurrentMemberId();
   }
 }

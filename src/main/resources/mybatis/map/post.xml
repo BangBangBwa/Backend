@@ -36,7 +36,7 @@
     LEFT JOIN
     streamers s ON m.id = s.member_id
     WHERE
-    p.created_at >= NOW() - INTERVAL 1 DAY
+    p.created_at >= NOW() - INTERVAL '1' DAY
     AND p.post_type = #{postType}
     GROUP BY
     s.id, m.profile

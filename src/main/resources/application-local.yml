@@ -4,7 +4,7 @@ server:
 spring:
   sql:
     init:
-      mode: always
+      mode: never
   datasource:
     url: jdbc:mysql://localhost:13306/bbb?useSSL=false&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver

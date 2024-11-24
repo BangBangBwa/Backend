@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="CommentMapper">
 
-  <insert id="save" parameterType="Comment" keyProperty="id" useGeneratedKeys="true">
+  <insert id="save" parameterType="Comment">
     INSERT INTO comments (post_id, member_id, content, created_id, created_at)
     VALUES (#{postId}, #{memberId}, #{content}, #{createdId}, #{createdAt})
   </insert>

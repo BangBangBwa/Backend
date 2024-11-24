@@ -46,7 +46,7 @@ public class StreamerController {
   @GetMapping("/getPostList")
   @PreAuthorize("hasAuthority('STREAMER')")
   public ApiResponse<List<Response>> getPostList() {
-    List<Post> postList = snsService.getPostList(PostType.STREAMER);
+    List<Post> postList = snsService.getPostList(PostType.MEMBER);
     List<GetPostListDto.Response> response = PostMapper.INSTANCE.dtoToGetPostListResponse(postList);
     return ApiResponse.ok(response);
   }
