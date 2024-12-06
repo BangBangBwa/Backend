@@ -107,10 +107,16 @@ public class SnsService {
     return response;
   }
 
+  // note. streamer 계정이 조회했을 때의 작업 필요
   public List<Post> getPostList() {
     Role role = memberProvider.getCurrentRole();
     PostType postType = postTypeProvider.getInversePostTypeForRole(role);
-    return postProvider.getRandomPost(postType);
+
+    if (role == Role.GUEST) { return postProvider.getRandomPost(postType); }
+    if (role == Role.STREAMER) { return postProvider.getRandomPost(postType); }
+    Long memberId = memberProvider.getCurrentMemberId();
+    Set<String> readPostIds = readerPostReader.findAllReadPostsByMemberId(memberId);
+    return postProvider.getMemberPersonalizedPosts(memberId, readPostIds);
   }
 
   public List<GetLatestPostsDto.Response> getLatestPosts(PostType postType) {

@@ -17,6 +17,10 @@
     SELECT * FROM posts WHERE post_type = #{postType};
   </select>
 
+  <select id="findPostsByPostTypeWithLimit" parameterType="map" resultType="post">
+    SELECT * FROM posts WHERE post_type = #{postType} LIMIT #{size};
+  </select>
+
 
   <resultMap id="GetLatestPostsDtoMap" type="com.bangbangbwa.backend.domain.sns.common.dto.GetLatestPostsDto">
     <result property="memberId" column="memberId" />
@@ -60,11 +64,76 @@
       ELSE false
     END AS isFollowed
     FROM posts p
-    LEFT JOIN members m ON p.member_id = m.id
+      LEFT JOIN members m ON p.member_id = m.id
     LEFT JOIN comments c ON c.post_id = p.id AND c.member_id = #{memberId}
     LEFT JOIN follow f ON f.follower_id = #{memberId} AND f.followee_id = p.member_id
     WHERE p.id = #{postId}
   </select>
 
+
+
+  <select id="findByPostTypeAndRandomPostsExcludingReadIds" parameterType="map" resultType="post">
+    SELECT *
+    FROM posts
+    WHERE post_type = #{postType}
+    <if test="readPostIds != null and readPostIds.size() > 0">
+      AND id NOT IN
+      <foreach item="id" collection="readPostIds" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    </if>
+    ORDER BY RAND()
+    LIMIT #{limit}
+  </select>
+
+
+
+  <select id="findPostsByFollowedStreamerExcludingReadIds" parameterType="map" resultType="post">
+    SELECT p.*
+    FROM posts p
+    WHERE p.post_type = 'STREAMER'
+    AND p.member_id IN (
+    SELECT s.member_id
+    FROM streamers s
+    WHERE s.id IN (
+    SELECT st.streamer_id
+    FROM streamers_tags st
+    WHERE st.tag_id IN (
+    SELECT mt.tag_id
+    FROM members_tags mt
+    WHERE mt.member_id = #{memberId}
+    )
+    )
+    )
+    <if test="readPostIds != null and readPostIds.size() > 0">
+      AND p.id NOT IN
+      <foreach item="id" collection="readPostIds" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    </if>
+    LIMIT #{limit}
+  </select>
+
+
+
+
+
+  <select id="findPostsByFollowStreamerExcludingReadIds" parameterType="map" resultType="Post">
+    SELECT p.*
+    FROM posts p
+    WHERE p.post_type = 'STREAMER'
+    AND p.member_id IN (
+    SELECT f.followee_id
+    FROM follow f
+    WHERE f.follower_id = #{memberId}
+    )
+    <if test="readPostIds != null and readPostIds.size() > 0">
+      AND p.id NOT IN
+      <foreach item="id" collection="readPostIds" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    </if>
+    LIMIT #{limit}
+  </select>
 
 </mapper>

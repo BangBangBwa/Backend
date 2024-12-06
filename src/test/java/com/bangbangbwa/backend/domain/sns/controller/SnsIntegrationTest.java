@@ -182,7 +182,7 @@ class SnsIntegrationTest extends IntegrationTest {
 
   // note. 이미지/동영상 여부 값 비교 필요
   @Test
-  void getPostList() {
+  void getPostList_토큰_보유() {
     // given
     Role memberRole = (RandomValue.getInt(2) == 1) ? Role.MEMBER : Role.STREAMER;
     PostType postType = (memberRole == Role.MEMBER) ? PostType.STREAMER : PostType.MEMBER;
