@@ -23,7 +23,6 @@ public class ReportPost {
     private LocalDateTime createdAt;
     private String updatedId;
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
 
     @Builder
     public ReportPost(Long postId, String reason, String createdId) {
@@ -36,5 +35,11 @@ public class ReportPost {
 
     public void updateCreatedId(Long memberId) {
         this.createdId = memberId.toString();
+    }
+
+    public void updateStatus(ReportStatus status, Long updatedId) {
+        this.status = status;
+        this.updatedId = updatedId.toString();
+        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -129,4 +129,22 @@ class ReportPostRepositoryTest extends MyBatisTest {
           assertThat(getReportPosts.get(i).reportDate().withNano(0)).isEqualTo(reportPosts.get(i).getCreatedAt().withNano(0));
         });
   }
+
+  @Test()
+  void findById() {
+    // given
+    Member member = createMember();
+    Member writeMember = createMember();
+    PostType postType = RandomValue.getRandomEnum(PostType.class);
+    Post post = createPost(postType, writeMember);
+    ReportPost reportPost = createReportPost(post, member);
+
+    // when
+    ReportPost getReportPost = reportPostRepository.findById(reportPost.getId())
+        .orElseThrow(AssertionError::new);
+
+    // then
+    assertThat(getReportPost.getId()).isEqualTo(reportPost.getId());
+    assertThat(getReportPost).usingRecursiveComparison().isEqualTo(reportPost);
+  }
 }

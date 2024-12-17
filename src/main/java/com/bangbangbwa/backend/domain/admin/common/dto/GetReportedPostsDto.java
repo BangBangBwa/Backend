@@ -13,6 +13,8 @@ public class GetReportedPostsDto {
 
   @Schema(name = "GetReportedPostsResponses")
   public record GetReportedPostsResponse(
+      @Schema(description = "신고 ID")
+      Long reportPostId,
       @Schema(description = "게시물 ID")
       Long postId,
       @Schema(description = "작성자 ID")

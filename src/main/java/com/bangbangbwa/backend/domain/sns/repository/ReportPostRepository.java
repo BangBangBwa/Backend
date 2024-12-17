@@ -33,4 +33,8 @@ public class ReportPostRepository {
     public List<GetReportedPostsResponse> findAllPendingReports() {
         return mysql.selectList("ReportPostMapper.findAllPendingReports");
     }
+
+    public Optional<ReportPost> findById(Long id) {
+        return Optional.ofNullable(mysql.selectOne("ReportPostMapper.findById", id));
+    }
 }
