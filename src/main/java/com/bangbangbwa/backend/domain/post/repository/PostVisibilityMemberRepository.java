@@ -1,4 +1,4 @@
-package com.bangbangbwa.backend.domain.sns.repository;
+package com.bangbangbwa.backend.domain.post.repository;
 
 import com.bangbangbwa.backend.domain.post.common.entity.PostVisibilityMember;
 import java.util.List;
@@ -14,6 +14,11 @@ public class PostVisibilityMemberRepository {
 
   public void saveList(List<PostVisibilityMember> memberList) {
     mysql.insert("PostVisibilityMember.saveList", memberList);
+  }
+
+
+  public List<PostVisibilityMember> findPrivatePostsByMemberId(Long memberId) {
+    return mysql.selectList("PostVisibilityMember.findPrivatePostsByMemberId", memberId);
   }
 
 }

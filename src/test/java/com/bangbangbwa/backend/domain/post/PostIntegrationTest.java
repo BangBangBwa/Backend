@@ -12,12 +12,15 @@ import com.bangbangbwa.backend.domain.oauth.common.dto.OAuthInfoDto;
 import com.bangbangbwa.backend.domain.oauth.common.enums.SnsType;
 import com.bangbangbwa.backend.domain.post.common.dto.GetPostListDto;
 import com.bangbangbwa.backend.domain.post.common.entity.Post;
+import com.bangbangbwa.backend.domain.post.common.entity.PostVisibilityMember;
 import com.bangbangbwa.backend.domain.post.common.enums.PostType;
+import com.bangbangbwa.backend.domain.post.repository.PostVisibilityMemberRepository;
 import com.bangbangbwa.backend.domain.promotion.common.entity.Streamer;
 import com.bangbangbwa.backend.domain.promotion.repository.StreamerRepository;
 import com.bangbangbwa.backend.domain.sns.common.entity.Comment;
 import com.bangbangbwa.backend.domain.sns.common.entity.ReportComment;
 import com.bangbangbwa.backend.domain.sns.common.entity.ReportPost;
+import com.bangbangbwa.backend.domain.sns.common.enums.VisibilityType;
 import com.bangbangbwa.backend.domain.sns.repository.CommentRepository;
 import com.bangbangbwa.backend.domain.sns.repository.PostRepository;
 import com.bangbangbwa.backend.domain.sns.repository.ReaderPostRepository;
@@ -35,6 +38,7 @@ import com.bangbangbwa.backend.global.test.IntegrationTest;
 import com.bangbangbwa.backend.global.util.S3Manager;
 import com.bangbangbwa.backend.global.util.randomValue.RandomValue;
 import com.google.gson.reflect.TypeToken;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
@@ -94,6 +98,9 @@ class PostIntegrationTest extends IntegrationTest {
 
   @Autowired
   private StreamerTagRepository streamerTagRepository;
+
+  @Autowired
+  private PostVisibilityMemberRepository postVisibilityMemberRepository;
 
   @MockBean
   private S3Manager s3Manager;
@@ -210,6 +217,23 @@ class PostIntegrationTest extends IntegrationTest {
   }
 
 
+  private List<PostVisibilityMember> getPostVisibilityMember(Post post, Member member, VisibilityType type) {
+    return Collections.singletonList(PostVisibilityMember.builder()
+        .postId(post.getId())
+        .memberId(member.getId())
+        .type(type)
+        .createdId("id")
+        .build());
+  }
+
+  private List<PostVisibilityMember> createPostVisibilityMembers(Post post, Member member, VisibilityType type) {
+    List<PostVisibilityMember> postVisibilityMembers = getPostVisibilityMember(post, member, type);
+    postVisibilityMemberRepository.saveList(postVisibilityMembers);
+    return postVisibilityMembers;
+  }
+
+
+
   @Test()
   void getPostList_토큰_보유_멤버() {
     // given
@@ -306,6 +330,128 @@ class PostIntegrationTest extends IntegrationTest {
     assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertNotNull(apiResponse.getData());
     assertThat(apiResponse.getData().size()).isEqualTo(postCount);
+
+  }
+
+
+  @Test
+  void getPostList_토큰_미입력_비공개_게시물() {
+    // given
+    PostType postType = PostType.STREAMER;
+    Member writeMember = createMember();
+
+    int postCount = RandomValue.getInt(0, 5);
+    int publicCount = RandomValue.getInt(0, 5);
+    int privateCount = RandomValue.getInt(0, 5);
+
+    IntStream.range(0, postCount)
+        .forEach(i -> createPost(postType, writeMember));
+
+    IntStream.range(0, publicCount).forEach(i -> {
+      Post p = createPost(postType, writeMember);
+      createPostVisibilityMembers(p, writeMember, VisibilityType.PUBLIC);
+    });
+    IntStream.range(0, privateCount).forEach(i -> {
+      Post p = createPost(postType, writeMember);
+      createPostVisibilityMembers(p, writeMember, VisibilityType.PRIVATE);
+    });
+
+    String url = "http://localhost:" + port + "/api/v1/posts/getPostList";
+
+    // when
+    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+        url,
+        String.class
+    );
+
+    ApiResponse<List<GetPostListDto.Response>> apiResponse = gson.fromJson(
+        responseEntity.getBody(),
+        new TypeToken<ApiResponse<List<GetPostListDto.Response>>>() {
+        }.getType()
+    );
+
+    // then
+    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertNotNull(apiResponse.getData());
+    assertThat(apiResponse.getData().size()).isEqualTo(postCount);
+
+  }
+
+  @Test()
+  void getPostList_토큰_보유_비공개_게시물() {
+    // given
+    int POST_SIZE = 7;
+    Role memberRole = Role.MEMBER;
+    PostType postType = PostType.STREAMER;
+    Member member = getMember();
+    member.updateRole(memberRole);
+    memberRepository.save(member);
+
+    Tag tag = createTag();
+    memberTagRepository.save(member.getId(), tag.getId());
+
+    TokenDto tokenDto = tokenProvider.getToken(member);
+
+    Member writeMember = createMember();
+    int postCount = RandomValue.getInt(0, 5);
+    List<Post> postList = IntStream.range(0, postCount)
+        .mapToObj(i -> createPost(postType, writeMember))
+        .toList();
+
+    int publicCount = RandomValue.getInt(0, 5);
+    IntStream.range(0, publicCount).forEach(i -> {
+      Post p = createPost(postType, writeMember);
+      createPostVisibilityMembers(p, writeMember, VisibilityType.PUBLIC);
+    });
+
+    int privateCount = RandomValue.getInt(0, 5);
+    IntStream.range(0, privateCount).forEach(i -> {
+      Post p = createPost(postType, writeMember);
+      createPostVisibilityMembers(p, writeMember, VisibilityType.PRIVATE);
+    });
+
+    Member writeFollowMember = createMember();
+    createFollow(member, writeFollowMember);
+    int followPostCount = RandomValue.getInt(0, 5);
+    List<Post> followPostList = IntStream.range(0, followPostCount)
+        .mapToObj(i -> createPost(postType, writeFollowMember))
+        .toList();
+
+    Member writeTagMember = createMember();
+    Streamer streamer = createStreamer(writeTagMember);
+    streamerRepository.save(streamer);
+    streamerTagRepository.save(streamer.getId(), tag.getId());
+    int tagPostCount = RandomValue.getInt(0, 5);
+    List<Post> tagPostList = IntStream.range(0, tagPostCount)
+        .mapToObj(i -> createPost(postType, writeTagMember))
+        .toList();
+
+    int totalPostCount = Math.min(POST_SIZE, tagPostCount + followPostCount + postCount);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(tokenDto.getAccessToken());
+    HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+    String url = "http://localhost:" + port + "/api/v1/posts/getPostList";
+
+    // when
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        url,
+        HttpMethod.GET,
+        requestEntity,
+        String.class
+    );
+
+    ApiResponse<List<GetPostListDto.Response>> apiResponse = gson.fromJson(
+        responseEntity.getBody(),
+        new TypeToken<ApiResponse<List<GetPostListDto.Response>>>() {
+        }.getType()
+    );
+
+    // then
+    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertNotNull(apiResponse.getData());
+    assertThat(apiResponse.getData().size()).isEqualTo(totalPostCount);
 
   }
 }

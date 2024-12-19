@@ -13,10 +13,6 @@
     SELECT * FROM posts WHERE id = #{id};
   </select>
 
-  <select id="findAllByPostType" parameterType="PostType" resultType="post">
-    SELECT * FROM posts WHERE post_type = #{postType};
-  </select>
-
   <select id="findPostsByPostTypeWithLimit" parameterType="map" resultType="post">
     SELECT * FROM posts WHERE post_type = #{postType} LIMIT #{size};
   </select>
@@ -188,6 +184,16 @@
       </foreach>
     </if>
     LIMIT #{limit}
+  </select>
+
+
+  <select id="findPublicPostsByPostTypeWithLimit" parameterType="map" resultType="Post">
+    SELECT p.*
+    FROM posts p
+    LEFT JOIN posts_visibility_member pvm ON p.id = pvm.post_id
+    WHERE p.post_type = #{postType}
+    AND pvm.post_id IS NULL
+    LIMIT #{size}
   </select>
 
 </mapper>

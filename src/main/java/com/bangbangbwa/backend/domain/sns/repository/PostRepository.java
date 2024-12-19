@@ -32,11 +32,11 @@ public class PostRepository {
     return mysql.selectList("PostMapper.findAllByPostType", postType);
   }
 
-  public List<Post> findPostsByPostTypeWithLimit(PostType postType, int size) {
+  public List<Post> findPublicPostsByPostTypeWithLimit(PostType postType, int size) {
     Map<String, Object> params = new HashMap<>();
     params.put("postType", postType);
     params.put("size", size);
-    return mysql.selectList("PostMapper.findAllByPostType", params);
+    return mysql.selectList("PostMapper.findPublicPostsByPostTypeWithLimit", params);
   }
 
   public List<GetLatestPostsDto> findPostsWithinLast24Hours(PostType postType,

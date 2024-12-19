@@ -30,8 +30,8 @@ public class PostReader {
     return postRepository.findAllByPostType(postType);
   }
 
-  public List<Post> findPostsByPostTypeWithLimit(PostType postType, int size) {
-    return postRepository.findPostsByPostTypeWithLimit(postType, size);
+  public List<Post> findPublicPostsByPostTypeWithLimit(PostType postType, int size) {
+    return postRepository.findPublicPostsByPostTypeWithLimit(postType, size);
   }
 
   public List<GetLatestPostsDto> findPostsWithinLast24Hours(PostType postType,
@@ -69,4 +69,5 @@ public class PostReader {
   public List<PostDto> findPostsByMemberId(Long memberId) {
     return postRepository.findPostsByMemberId(memberId);
   }
+
 }

@@ -1,4 +1,4 @@
-package com.bangbangbwa.backend.domain.sns.business;
+package com.bangbangbwa.backend.domain.post.business;
 
 import com.bangbangbwa.backend.domain.post.common.entity.PostVisibilityMember;
 import com.bangbangbwa.backend.domain.post.repository.PostVisibilityMemberRepository;
@@ -8,11 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PostVisibilityMemberCreator {
+public class PostVisibilityMemberReader {
 
   private final PostVisibilityMemberRepository postVisibilityMemberRepository;
 
-  public void saveList(List<PostVisibilityMember> postVisibilityMemberList) {
-    postVisibilityMemberRepository.saveList(postVisibilityMemberList);
+  public List<PostVisibilityMember> findPrivatePostsByMemberId(Long memberId) {
+    return postVisibilityMemberRepository.findPrivatePostsByMemberId(memberId);
   }
+
 }

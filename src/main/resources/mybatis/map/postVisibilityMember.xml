@@ -11,4 +11,10 @@
     </foreach>
   </insert>
 
+  <select id="findPrivatePostsByMemberId" parameterType="Long" resultType="PostVisibilityMember">
+    SELECT p.*
+    FROM posts_visibility_member p
+    WHERE NOT (p.member_id = #{memberId} AND p.type = 'PUBLIC')
+  </select>
+
 </mapper>
