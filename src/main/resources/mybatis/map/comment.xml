@@ -9,4 +9,41 @@
     VALUES (#{postId}, #{memberId}, #{content}, #{createdId}, #{createdAt})
   </insert>
 
+  <select id="findById" parameterType="Long" resultType="comment">
+    SELECT
+    id,
+    post_id,
+    member_id,
+    reply_comment
+    FROM comments
+    WHERE id = #{commentId}
+  </select>
+
+  <select id="findCommentListByPostId" parameterType="Long">
+    <!--    resultType="com.bangbangbwa.backend.domain.comment.common.dto.MyPostCommentDto.MyPostCommentResponse">-->
+    <!--    SELECT-->
+    <!--    c.id AS id,-->
+    <!--    c.content AS content,-->
+    <!--    c.member_id AS memberId,-->
+    <!--    m.nickname AS memberNickname,-->
+    <!--    m.profile AS memberProfile,-->
+    <!--    c.reply_comment AS replyComment-->
+    <!--    FROM comments c-->
+    <!--    INNER JOIN members m ON c.member_id = m.id-->
+    <!--    WHERE c.post_id = #{postId}-->
+    <!--    ORDER BY c.created_at DESC-->
+  </select>
+
+  <select id="findCommentListByMemberId" parameterType="Long">
+    <!--    resultType="com.bangbangbwa.backend.domain.member.common.dto.CommentDto.CommentResponses">-->
+  </select>
+
+  <update id="updateForAddReply" parameterType="comment">
+    UPDATE comments
+    SET
+    reply_comment = #{replyComment},
+    updated_id = #{updatedId},
+    updated_at = #{updatedAt}
+    WHERE id = #{id}
+  </update>
 </mapper>

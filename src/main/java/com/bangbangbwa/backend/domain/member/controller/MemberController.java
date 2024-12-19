@@ -4,6 +4,7 @@ import com.bangbangbwa.backend.domain.member.common.dto.CommentDto;
 import com.bangbangbwa.backend.domain.member.common.dto.CommentDto.CommentResponse;
 import com.bangbangbwa.backend.domain.member.common.dto.CommentDto.CommentResponseCommentInfo;
 import com.bangbangbwa.backend.domain.member.common.dto.CommentDto.CommentResponsePostInfo;
+import com.bangbangbwa.backend.domain.member.common.dto.CommentDto.Response;
 import com.bangbangbwa.backend.domain.member.common.dto.FollowDto;
 import com.bangbangbwa.backend.domain.member.common.dto.FollowDto.FollowResponse;
 import com.bangbangbwa.backend.domain.member.common.dto.FollowerDto;
@@ -157,7 +158,7 @@ public class MemberController implements MemberApi {
 
   @GetMapping("/comments/{memberId}")
   @PermitAll()
-  public ApiResponse<CommentDto.Response> getComments(@PathVariable("memberId") Long memberId) {
+  public ApiResponse<Response> getComments(@PathVariable("memberId") Long memberId) {
     List<CommentResponse> commentResponses = new ArrayList<>();
     CommentResponsePostInfo postInfo;
     CommentResponseCommentInfo commentInfo;

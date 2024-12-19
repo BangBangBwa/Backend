@@ -117,6 +117,7 @@ CREATE TABLE comments
     post_id    BIGINT       NOT NULL COMMENT '게시물_ID',
     member_id  BIGINT       NOT NULL COMMENT '작성자_ID',
     content    VARCHAR(500) NOT NULL COMMENT '내용',
+    reply_comment VARCHAR(500) NULL COMMENT '답변',
     created_at DATETIME     NOT NULL COMMENT '생성 일시',
     created_id VARCHAR(255) NOT NULL COMMENT '생성자',
     updated_at DATETIME NULL COMMENT '수정 일시(null)',

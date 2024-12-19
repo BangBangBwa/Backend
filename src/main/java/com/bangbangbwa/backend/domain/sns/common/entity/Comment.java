@@ -19,6 +19,7 @@ public class Comment {
   private Long postId;
   private Long memberId;
   private String content;
+  private String replyComment;
   private String createdId;
   private LocalDateTime createdAt;
   private String updatedId;
@@ -36,5 +37,11 @@ public class Comment {
 
   public void updateMemberId(Long memberId) {
     this.memberId = memberId;
+  }
+
+  public void updateReplyComment(String replyComment) {
+    this.replyComment = replyComment;
+    this.updatedId = SELF;
+    this.updatedAt = LocalDateTime.now();
   }
 }
