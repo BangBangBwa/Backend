@@ -1,5 +1,6 @@
 package com.bangbangbwa.backend.domain.post.common.entity;
 
+import com.bangbangbwa.backend.domain.post.common.enums.MediaType;
 import com.bangbangbwa.backend.domain.post.common.enums.PostStatus;
 import com.bangbangbwa.backend.domain.post.common.enums.PostType;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class Post {
   private String createdId;
   private List<Long> publicMembers;
   private List<Long> privateMembers;
+  private MediaType mediaType;
   private LocalDateTime createdAt;
   private String updatedId;
   private LocalDateTime updatedAt;
@@ -51,6 +53,10 @@ public class Post {
 
   public void updateMemberId(Long memberId) {
     this.memberId = memberId;
+  }
+
+  public void updateMediaType(MediaType mediaType) {
+    this.mediaType = mediaType;
   }
 
   public void deletePost() {

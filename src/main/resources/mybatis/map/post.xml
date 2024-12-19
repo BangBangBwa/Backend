@@ -5,8 +5,8 @@
 <mapper namespace="PostMapper">
 
   <insert id="save" parameterType="Post" keyProperty="id" useGeneratedKeys="true">
-    INSERT INTO posts (post_type, member_id, title, content, status, created_id, created_at)
-    VALUES (#{postType}, #{memberId}, #{title}, #{content}, #{status}, #{createdId}, #{createdAt})
+    INSERT INTO posts (post_type, member_id, title, content, status, media_type, created_id, created_at)
+    VALUES (#{postType}, #{memberId}, #{title}, #{content}, #{status}, #{mediaType}, #{createdId}, #{createdAt})
   </insert>
 
   <select id="findById" parameterType="Long" resultType="post">

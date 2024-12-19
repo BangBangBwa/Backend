@@ -47,16 +47,6 @@ public class SnsController implements SnsApi {
     return ApiResponse.ok(response);
   }
 
-  @PostMapping("/createPost")
-  @PreAuthorize("hasAuthority('MEMBER')")
-  public ApiResponse<CreatePostDto.Response> createPost(
-      @RequestBody @Valid CreatePostDto.Request request
-  ) {
-    Post post = snsService.createPost(request);
-    CreatePostDto.Response response = PostMapper.INSTANCE.dtoToCreatePostResponse(post);
-    return ApiResponse.ok(response);
-  }
-
   @PostMapping(value = "/uploadPostMedia", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @PreAuthorize("hasAuthority('MEMBER')")
   public ApiResponse<UploadPostMediaDto.Response> uploadPostMedia(

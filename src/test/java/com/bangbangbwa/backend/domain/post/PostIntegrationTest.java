@@ -1,6 +1,7 @@
 package com.bangbangbwa.backend.domain.post;
 
 import static com.mongodb.assertions.Assertions.assertNotNull;
+import static com.mongodb.assertions.Assertions.assertNull;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.bangbangbwa.backend.domain.member.common.entity.Follow;
@@ -10,6 +11,7 @@ import com.bangbangbwa.backend.domain.member.repository.FollowRepository;
 import com.bangbangbwa.backend.domain.member.repository.MemberRepository;
 import com.bangbangbwa.backend.domain.oauth.common.dto.OAuthInfoDto;
 import com.bangbangbwa.backend.domain.oauth.common.enums.SnsType;
+import com.bangbangbwa.backend.domain.post.common.dto.CreatePostDto;
 import com.bangbangbwa.backend.domain.post.common.dto.GetPostListDto;
 import com.bangbangbwa.backend.domain.post.common.entity.Post;
 import com.bangbangbwa.backend.domain.post.common.enums.PostType;
@@ -18,6 +20,7 @@ import com.bangbangbwa.backend.domain.promotion.repository.StreamerRepository;
 import com.bangbangbwa.backend.domain.sns.common.entity.Comment;
 import com.bangbangbwa.backend.domain.sns.common.entity.ReportComment;
 import com.bangbangbwa.backend.domain.sns.common.entity.ReportPost;
+import com.bangbangbwa.backend.domain.sns.exception.InvalidMemberVisibilityException;
 import com.bangbangbwa.backend.domain.sns.repository.CommentRepository;
 import com.bangbangbwa.backend.domain.sns.repository.PostRepository;
 import com.bangbangbwa.backend.domain.sns.repository.ReaderPostRepository;
@@ -30,11 +33,13 @@ import com.bangbangbwa.backend.domain.tag.repository.StreamerTagRepository;
 import com.bangbangbwa.backend.domain.tag.repository.TagRepository;
 import com.bangbangbwa.backend.domain.token.business.TokenProvider;
 import com.bangbangbwa.backend.domain.token.common.dto.TokenDto;
+import com.bangbangbwa.backend.domain.token.common.exception.AuthenticationRequiredException;
 import com.bangbangbwa.backend.global.response.ApiResponse;
 import com.bangbangbwa.backend.global.test.IntegrationTest;
 import com.bangbangbwa.backend.global.util.S3Manager;
 import com.bangbangbwa.backend.global.util.randomValue.RandomValue;
 import com.google.gson.reflect.TypeToken;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
@@ -308,4 +313,130 @@ class PostIntegrationTest extends IntegrationTest {
     assertThat(apiResponse.getData().size()).isEqualTo(postCount);
 
   }
+
+
+  // note. PostType 랜덤 지정하도록 변경 필요
+  @Test
+  void createPost_성공() {
+    // given
+    Member member = createMember();
+    TokenDto tokenDto = tokenProvider.getToken(member);
+
+    List<Long> nullList = new ArrayList<>();
+    CreatePostDto.Request request = new CreatePostDto.Request(
+        PostType.MEMBER,
+        RandomValue.string(100).setNullable(false).get(),
+        RandomValue.string(2000).setNullable(false).get(),
+        nullList,
+        nullList
+    );
+
+    String url = "http://localhost:" + port + "/api/v1/posts/createPost";
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(tokenDto.getAccessToken());
+    HttpEntity<CreatePostDto.Request> requestEntity = new HttpEntity<>(request, headers);
+
+    // when
+    ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+        url,
+        requestEntity,
+        String.class
+    );
+
+    ApiResponse<CreatePostDto.Response> apiResponse = gson.fromJson(
+        responseEntity.getBody(),
+        new TypeToken<ApiResponse<CreatePostDto.Response>>() {
+        }.getType()
+    );
+
+    // then
+    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertNotNull(apiResponse.getData());
+    assertThat(apiResponse.getData().postType()).isEqualTo(request.postType());
+    assertThat(apiResponse.getData().title()).isEqualTo(request.title());
+    assertThat(apiResponse.getData().content()).isEqualTo(request.content());
+
+  }
+
+
+  @Test
+  void createPost_공개_비공개_중복_입력() {
+    // given
+    Member member = createMember();
+    TokenDto tokenDto = tokenProvider.getToken(member);
+
+    List<Long> memberIds = List.of(1L, 2L);
+    CreatePostDto.Request request = new CreatePostDto.Request(
+        PostType.MEMBER,
+        RandomValue.string(100).setNullable(false).get(),
+        RandomValue.string(2000).setNullable(false).get(),
+        memberIds,
+        memberIds
+    );
+
+    String url = "http://localhost:" + port + "/api/v1/posts/createPost";
+
+    InvalidMemberVisibilityException exception = new InvalidMemberVisibilityException();
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(tokenDto.getAccessToken());
+    HttpEntity<CreatePostDto.Request> requestEntity = new HttpEntity<>(request, headers);
+
+    // when
+    ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+        url,
+        requestEntity,
+        String.class
+    );
+
+    ApiResponse<CreatePostDto.Response> apiResponse = gson.fromJson(
+        responseEntity.getBody(),
+        new TypeToken<ApiResponse<CreatePostDto.Response>>() {
+        }.getType()
+    );
+
+    // then
+    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(apiResponse.getCode()).isEqualTo(exception.getCode());
+    assertThat(apiResponse.getMessage()).isEqualTo(exception.getMessage());
+    assertNull(apiResponse.getData());
+  }
+
+  @Test
+  void createPost_토큰_미입력() {
+    // given
+    List<Long> memberIds = List.of(1L, 2L);
+    CreatePostDto.Request request = new CreatePostDto.Request(
+        PostType.MEMBER,
+        RandomValue.string(100).setNullable(false).get(),
+        RandomValue.string(2000).setNullable(false).get(),
+        memberIds,
+        memberIds
+    );
+
+    String url = "http://localhost:" + port + "/api/v1/posts/createPost";
+
+    AuthenticationRequiredException exception = new AuthenticationRequiredException();
+
+    // when
+    ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+        url,
+        request,
+        String.class
+    );
+
+    ApiResponse<CreatePostDto.Response> apiResponse = gson.fromJson(
+        responseEntity.getBody(),
+        new TypeToken<ApiResponse<CreatePostDto.Response>>() {
+        }.getType()
+    );
+
+    // then
+    assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    assertThat(apiResponse.getCode()).isEqualTo(exception.getCode());
+    assertThat(apiResponse.getMessage()).isEqualTo(exception.getMessage());
+    assertNull(apiResponse.getData());
+  }
+
 }

@@ -76,6 +76,8 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.2'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
 
+    // Jsoup
+    implementation 'org.jsoup:jsoup:1.18.3'
 
     // Test
     testRuntimeOnly 'com.h2database:h2:2.2.224'

@@ -86,6 +86,7 @@ CREATE TABLE posts
     title      VARCHAR(100) COMMENT '제목',
     content    VARCHAR(4000) COMMENT '내용',
     pinned     BOOLEAN       COMMENT '고정 여부',
+    media_type VARCHAR(10)  COMMENT '미디어 타입',
     created_at DATETIME     NOT NULL COMMENT '생성 일시',
     created_id VARCHAR(255) NOT NULL COMMENT '생성자',
     updated_at DATETIME NULL COMMENT '수정 일시(null)',

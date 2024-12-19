@@ -75,34 +75,6 @@ public class SnsService {
   private final ReaderPostReader readerPostReader;
   private final ReaderPostCreator readerPostCreator;
 
-  // 게시글 저장 전, content에서 url을 추출 후 redis 값 삭제하는 과정 필요
-  @Transactional
-  public Post createPost(CreatePostDto.Request request) {
-    Member member = memberProvider.getCurrentMember();
-    PostType postType = request.postType();
-    memberValidator.validateRole(member.getRole(), postType);
-
-    Post post = postGenerator.generate(request, member);
-    postCreator.save(post);
-
-    VisibilityType type = postValidator.validateMembers(
-        request.publicMembers(),
-        request.privateMembers()
-    );
-
-    if (type != null) {
-      List<Long> memberList = (type == VisibilityType.PRIVATE) ?
-          request.privateMembers() : request.publicMembers();
-
-      List<PostVisibilityMember> postVisibilityMember = postVisibilityMemberGenerator.generate(
-          post, type, memberList
-      );
-
-      postVisibilityMemberCreator.saveList(postVisibilityMember);
-    }
-
-    return post;
-  }
 
   public String uploadPostMedia(MultipartFile file) {
     return s3Manager.upload(file);
