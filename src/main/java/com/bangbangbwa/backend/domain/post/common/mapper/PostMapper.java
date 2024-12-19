@@ -5,6 +5,7 @@ import com.bangbangbwa.backend.domain.post.common.dto.CreatePostDto;
 import com.bangbangbwa.backend.domain.post.common.dto.GetPostListDto;
 import com.bangbangbwa.backend.domain.post.common.dto.UploadPostMediaDto;
 import com.bangbangbwa.backend.domain.post.common.entity.Post;
+import com.bangbangbwa.backend.domain.post.common.enums.MediaType;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,10 +34,19 @@ public interface PostMapper {
   UploadPostMediaDto.Response dtoToUploadPostMediaResponse(String url);
 
   @Mapping(target = "postId", source = "id")
+  @Mapping(target = "hasImage", expression = "java(isMediaTypePhoto(post.getMediaType()))")
+  @Mapping(target = "hasVideo", expression = "java(isMediaTypeMedia(post.getMediaType()))")
   GetPostListDto.Response dtoToGetPostListResponse(Post post);
 
   List<GetPostListDto.Response> dtoToGetPostListResponse(List<Post> postList);
 
+  default boolean isMediaTypePhoto(MediaType mediaType) {
+    return mediaType == MediaType.BOTH || mediaType == MediaType.PHOTO;
+  }
+
+  default boolean isMediaTypeMedia(MediaType mediaType) {
+    return mediaType == MediaType.BOTH || mediaType == MediaType.VIDEO;
+  }
 
   List<PostDto.PostResponse> dtoToPostResponse(List<PostDto> postDtos);
 

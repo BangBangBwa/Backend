@@ -12,6 +12,7 @@ import com.bangbangbwa.backend.domain.oauth.common.dto.OAuthInfoDto;
 import com.bangbangbwa.backend.domain.oauth.common.enums.SnsType;
 import com.bangbangbwa.backend.domain.post.common.dto.GetPostListDto.Response;
 import com.bangbangbwa.backend.domain.post.common.entity.Post;
+import com.bangbangbwa.backend.domain.post.common.enums.MediaType;
 import com.bangbangbwa.backend.domain.post.common.enums.PostType;
 import com.bangbangbwa.backend.domain.sns.repository.PostRepository;
 import com.bangbangbwa.backend.domain.token.business.TokenProvider;
@@ -71,12 +72,14 @@ class StreamerTest extends IntegrationTest {
   }
 
   private Post getPost(PostType postType, Member member) {
-    return Post.builder()
+    Post post = Post.builder()
         .postType(postType)
         .memberId(member.getId())
         .title(RandomValue.string(100).setNullable(false).get())
         .content(RandomValue.string(2000).setNullable(false).get())
         .build();
+    post.updateMediaType(RandomValue.getRandomEnum(MediaType.class));
+    return post;
   }
 
   private Post createPost(PostType postType, Member writeMember) {
